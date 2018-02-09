@@ -26,9 +26,28 @@ let teamJaune = [];
 let teamRouge = [];
 
 client.on('message', message => {
-
+    
     let msgArgs = message.content.split(' ');
     let member = message.member;
+    
+    if(message.content.startsWith('!help')){
+        let help = new Discord.RichEmbed()
+            .setAuthor(client.user.username)
+            .setColor('RANDOM')
+            .setTitle('Liste des commandes du bot !')
+            .addBlankField(true)
+            .addField('!help', 'Avoir la liste des commandes du bot.')
+            .addBlankField(true)
+            .addField('Commande Administrateur', 'Seul les admin du serveur peuvent avoir accès à ces commandes !')
+            .addField('!launchgame', 'Lancer une partie de KohLanta.')
+            .addField('!setjointeam', 'Autoriser les joueurs à rejoindre les équipes.')
+            .addBlankField(true)
+            .addField('Liste de commandes pour les joueurs !', 'commandes executable par tout le monde !')
+            .addField('!join', 'Rejoidre une team.')
+            .addField('!leave', 'Quitter une équipe.');
+        message.author.sendEmbed(help);
+        
+    }
 
     if(message.content.startsWith('!launchgame')){
         if(gameOn === false){
