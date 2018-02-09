@@ -13,7 +13,7 @@ let usersCount = client.users.size;
 client.on('ready', () => {
 
     console.log('Bot lancé \n Le prefix est: ' + prefix +'\n Il y a actuellement: ' + usersCount + ' membre(s) sur le serveur');
-    bot.user.setPresence({game: {name: '!help ;)', type: 0}});
+    client.user.setPresence({game: {name: '!help ;)', type: 0}});
     gameOn = false;
     joinTeam = false;
     teamJaune = [];
