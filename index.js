@@ -236,10 +236,11 @@ client.on('message', message => {
     function randomNumber(max){
 
         let r = Math.floor(Math.random() * Math.floor(max)) + 1;
-        if(!epreuve.includes(r)){
-            return r;
-        }else{
+        if(epreuve.includes(r)){
             randomNumber(max);
+        }else{
+            epreuve.push(r);
+            return r;
         }
     }
 
