@@ -3,9 +3,9 @@ const lowdb = require('lowdb');
 
 const client = new Discord.Client();
 
-const FileSync = require('lowdb/adapters/FileSync.js');
-const adapter = new FileSync('db.json');
-const db = lowdb(adapter);
+const FileSync = require('lowdb/adapters/FileSync.js');
+const adapter = new FileSync('db.json');
+const db = lowdb(adapter);
 
 let prefix = '!';
 let usersCount = client.users.size;
@@ -13,6 +13,7 @@ let usersCount = client.users.size;
 client.on('ready', () => {
 
     console.log('Bot lancé \n Le prefix est: ' + prefix +'\n Il y a actuellement: ' + usersCount + ' membre(s) sur le serveur');
+    bot.user.setPresence({game: {name: '!help ;)', type: 0}});
     gameOn = false;
     joinTeam = false;
     teamJaune = [];
@@ -24,6 +25,7 @@ let gameOn = false;
 let joinTeam = false;
 let teamJaune = [];
 let teamRouge = [];
+let epreuve = [];
 
 client.on('message', message => {
     
@@ -73,6 +75,13 @@ client.on('message', message => {
                 .addField('Partie déjà lancé !', 'Finissez la partie avant de recommancé :)');
             message.channel.sendEmbed(errorEmbed);
         }
+    }
+
+    if(message.content.startsWith('!newepreuve')){
+
+        let epreuveChoice = randomNumber(2);
+        epreuve(epreuveChoice);
+
     }
 
     if(message.content.startsWith('!setjointeam')){
@@ -223,6 +232,40 @@ client.on('message', message => {
             teamRouge.splice(pseudo);
         }
     }
+
+    function randomNumber(max){
+
+        let r = Math.floor(Math.random() * Math.floor(max)) + 1;
+        if(!epreuve.includes(r)){
+            return r;
+        }else{
+            randomNumber(max);
+        }
+    }
+
+    function epreuve(number){
+
+        if(number == 1){
+            message.channel.sendMessage('epreuve 1 choisi');
+        }else if(number == 2){
+            message.channel.sendMessage('epreuve 2 choisi');
+        }else{
+            message.channel.sendMessage('bug');
+        }
+
+    }
 })
 
 client.login(process.env.TOKEN);
+
+let livreDeCode = new Discord.RichEmbed()
+    .setAuthor(client.user.username)
+    .setColor('#00aaFF')
+    .setTitle('Livre de code pour l\'épreuve')
+    .addField('Ce livre contient different ligne de code qui vont vous servir pour l\'épreuve', 'Alors apprennez les !')
+    .addBlankField(true)
+    .addField('function parler(mot)', 'pour faire parler quelqu\'un ou quelque chose !')
+    .addField('let variable = 10', 'pour définir une variable égale à 10')
+    .addField('if(something == something)', 'pour savoir si quelquchose = quelquechose !')
+    .addBlankField(true)
+    .addField('Apprennez ces trois ligne de code', 'Lors de l\'épreuve il peut y avoir des variante !');
