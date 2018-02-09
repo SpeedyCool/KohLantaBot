@@ -32,13 +32,21 @@ client.on('message', message => {
 
     if(message.content.startsWith('!launchgame')){
         if(gameOn === false){
-            gameOn = true;
-            joinTeam = false;
-            let confirmEmbed = new Discord.RichEmbed()
-                .setAuthor(client.user.username)
-                .setColor('#007800')
-                .addField('Partie lancé !', 'Les joueur sont laché sur l\'ile');
-            message.channel.sendEmbed(confirmEmbed);
+            if(!teamJaune.length == 0 && !teamRouge.length == 0 && teamJaune.length == teamRouge.length){
+                gameOn = true;
+                joinTeam = false;
+                let confirmEmbed = new Discord.RichEmbed()
+                    .setAuthor(client.user.username)
+                    .setColor('#007800')
+                    .addField('Partie lancé !', 'Les joueur sont laché sur l\'ile');
+                message.channel.sendEmbed(confirmEmbed);
+            }else{
+                let error = new Discord.RichEmbed()
+                    .setAuthor(client.user.username)
+                    .setColor('#ab0000')
+                    .addField('Les conditions ne sont pas requises !', 'même nombre de joueur dans chaque equipe !');
+                message.channel.sendEmbed(error);
+            }
         }else{
             let errorEmbed = new Discord.RichEmbed()
                 .setAuthor(client.user.username)
