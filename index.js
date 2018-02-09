@@ -259,7 +259,7 @@ client.on('message', message => {
 client.login(process.env.TOKEN);
 
 let livreDeCode = new Discord.RichEmbed()
-    .setAuthor(client.user.username)
+    .setAuthor('KohLanta')
     .setColor('#00aaFF')
     .setTitle('Livre de code pour l\'épreuve')
     .addField('Ce livre contient different ligne de code qui vont vous servir pour l\'épreuve', 'Alors apprennez les !')
