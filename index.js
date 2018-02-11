@@ -18,6 +18,9 @@ client.on('ready', () => {
     joinTeam = false;
     teamJaune = [];
     teamRouge = [];
+    epreuve = [];
+
+    console.log(epreuve.includes(2));
 
 })
 
@@ -26,6 +29,8 @@ let joinTeam = false;
 let teamJaune = [];
 let teamRouge = [];
 let epreuve = [];
+let epreuveStarted = false;
+let reponse;
 
 client.on('message', message => {
     
@@ -43,6 +48,7 @@ client.on('message', message => {
             .addField('Commande Administrateur', 'Seul les admin du serveur peuvent avoir accès à ces commandes !')
             .addField('!launchgame', 'Lancer une partie de KohLanta.')
             .addField('!setjointeam', 'Autoriser les joueurs à rejoindre les équipes.')
+            .addField('!newepreuve', 'Lancement d\'une épreuve !')
             .addBlankField(true)
             .addField('Liste de commandes pour les joueurs !', 'commandes executable par tout le monde !')
             .addField('!join', 'Rejoidre une team.')
@@ -80,8 +86,38 @@ client.on('message', message => {
     if(message.content.startsWith('!newepreuve')){
 
         let epreuveChoice = randomNumber(2);
-        epreuve(epreuveChoice);
+        if(epreuveChoice == 0){
+            return;
+        }
+        epreuve.push(epreuveChoice);
+        lancementEpreuve(epreuveChoice); 
 
+    }
+
+    if(message.content.startsWith('!startepreuve')){
+        if(msgArgs[1] == 'code'){
+            message.channel.sendEmbed(code1);
+            reponse = 'if number 8';
+            epreuveStarted = true;
+        }
+    }
+
+    if(message.content.startsWith('!r')){
+        if(epreuveStarted == true){
+            let mreponse = message.content.substr(3);
+            if(mreponse == reponse){
+                epreuveStarted = false;
+                if(message.member.roles.find('name', 'teamJaune')){
+                    pointGagne('jaune');
+                    return;
+                }else{
+                    pointGagne('rouge');
+                    return;
+                }
+            }else{
+                message.reply('réponse fausse');
+            }
+        }
     }
 
     if(message.content.startsWith('!setjointeam')){
@@ -237,23 +273,45 @@ client.on('message', message => {
 
         let r = Math.floor(Math.random() * Math.floor(max)) + 1;
         if(epreuve.includes(r)){
-            randomNumber(max);
+            if(epreuve.length == 2){
+                let error = new Discord.RichEmbed()
+                    .setAuthor(client.user.username)
+                    .setColor('#dd0000')
+                    .addField('Toutes les épreuves ont eu lieu', 'redémarrez une parie !');
+                message.channel.sendEmbed(error);
+                return 0;
+            }
+            randomNumber(2);
         }else{
-            epreuve.push(r);
+            console.log(r); 
             return r;
         }
+  
     }
 
-    function epreuve(number){
+    function lancementEpreuve(number){
 
         if(number == 1){
             message.channel.sendMessage('epreuve 1 choisi');
-        }else if(number == 2){
-            message.channel.sendMessage('epreuve 2 choisi');
-        }else{
-            message.channel.sendMessage('bug');
         }
+        if(number == 2){
+            message.channel.sendEmbed(epreuveCode);
+            message.author.sendEmbed(confirmEpreuveCode);
+            let tribuJ = message.guild.channels.find('name', 'tribu-jaune');
+            let tribuR = message.guild.channels.find('name', 'tribu-rouge');
+            tribuJ.sendEmbed(livreDeCode);
+            tribuR.sendEmbed(livreDeCode);
+        }
+        console.log(epreuve);
 
+    }
+
+    function pointGagne(team){
+        let victoire = new Discord.RichEmbed()
+            .setAuthor(client.user.username)
+            .setColor('#00aa00')
+            .addField('L\'équipe ' + team + ' a remporté l\'épreuve !', '+1 points pour l\'équipe !');
+        message.channel.sendEmbed(victoire);
     }
 })
 
@@ -270,3 +328,28 @@ let livreDeCode = new Discord.RichEmbed()
     .addField('if(something == something)', 'pour savoir si quelquchose = quelquechose !')
     .addBlankField(true)
     .addField('Apprennez ces trois ligne de code', 'Lors de l\'épreuve il peut y avoir des variante !');
+
+let epreuveCode = new Discord.RichEmbed()
+    .setAuthor('KohLanta')
+    .setColor('RANDOM')
+    .setTitle('Epreuve du code')
+    .addField('@everyone L\'épreuve du code à été choisi', 'Un livre de code vous à été donné dans vos channels')
+    .addBlankField(true)
+    .addField('Lisez le et quand le staff aura décidé de lancé la partie', 'alors vous devrez compléter le code demandé !')
+    .addBlankField(true)
+    .setFooter('Bonne chance à tous');
+
+let confirmEpreuveCode = new Discord.RichEmbed()
+    .setAuthor('KohLanta')
+    .setColor('RANDOM')
+    .setTitle('Epreuve du code lancé !')
+    .addField('Vous pouvez lancer l\'épreuve quand vous voulez', '!startepreuve code');
+let code1 = new Discord.RichEmbed()
+    .setAuthor('KohLanta')
+    .setColor('#ab0000')
+    .addField('L\'épreuve du code est lancé', 'Il faut trouvé la bonne réponse la première équipe qui truve gagne le point')
+    .addBlankField(true)
+    .addField('Voici le code', 'Je veux savoir si ma variable number est égale à 8')
+    .addField(' __(______ == _)', '!r pour répondre, séparez les éléments de réponses par des espace: !r jl hhhhhh 7');
+
+
