@@ -383,7 +383,7 @@ client.on('message', message => {
     }
 })
 
-client.login('token');
+client.login(process.env.TOKEN);
 
 let livreDeCode = new Discord.RichEmbed()
     .setAuthor('KohLanta')
