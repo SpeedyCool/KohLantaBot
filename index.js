@@ -287,7 +287,7 @@ client.on('message', message => {
                             .push({user: message.author.id, hasObject: true})
                             .write();
                     }else{
-                        db.get('object').find({user: message.author.id}).assisgn({user: message.author.id, hasObject: true});
+                        db.get('object').find({user: message.author.id}).assign({user: message.author.id, hasObject: true});
                     }
 
                     let Embed = new Discord.RichEmbed()
@@ -301,7 +301,7 @@ client.on('message', message => {
                             .push({user: message.author.id, hasObject: false})
                             .write();
                     }else{
-                        db.get('object').find({user: message.author.id}).assisgn({user: message.author.id, hasObject: false});
+                        db.get('object').find({user: message.author.id}).assign({user: message.author.id, hasObject: false});
                     }
 
                     let Embed = new Discord.RichEmbed()
