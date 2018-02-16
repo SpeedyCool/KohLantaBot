@@ -274,7 +274,7 @@ client.on('message', message => {
                     .setAuthor(client.username)
                     .setColor('#ab0000')
                     .addField('Vous avez déjà chercher l\'object', 'réessayez plus tard !');
-                message.channel.send(Embed);
+                message.author.send(Embed);
             }else{
                 if(objectFind == false){
                     findObeject.push(message.author.username);
