@@ -7,6 +7,8 @@ const FileSync = require('lowdb/adapters/FileSync.js');
 const adapter = new FileSync('db.json');
 const db = lowdb(adapter);
 
+db.defaults({object: []}).write();
+
 let prefix = '!';
 let usersCount = client.users.size;
 
@@ -14,11 +16,15 @@ client.on('ready', () => {
 
     console.log('Bot lancé \n Le prefix est: ' + prefix +'\n Il y a actuellement: ' + usersCount + ' membre(s) sur le serveur');
     client.user.setPresence({game: {name: '!help ;)', type: 0}});
+
     gameOn = false;
     joinTeam = false;
     teamJaune = [];
     teamRouge = [];
     epreuve = [];
+    epreuveStarted = false
+    findObeject = [];
+    objectFind = false;
 
     console.log(epreuve.includes(2));
 
@@ -26,36 +32,21 @@ client.on('ready', () => {
 
 let gameOn = false;
 let joinTeam = false;
+
 let teamJaune = [];
 let teamRouge = [];
+
 let epreuve = [];
 let epreuveStarted = false;
 let reponse;
+
+let findObeject = [];
+let objectFind = false;
 
 client.on('message', message => {
     
     let msgArgs = message.content.split(' ');
     let member = message.member;
-    
-    if(message.content.startsWith('!help')){
-        let help = new Discord.RichEmbed()
-            .setAuthor(client.user.username)
-            .setColor('RANDOM')
-            .setTitle('Liste des commandes du bot !')
-            .addBlankField(true)
-            .addField('!help', 'Avoir la liste des commandes du bot.')
-            .addBlankField(true)
-            .addField('Commande Administrateur', 'Seul les admin du serveur peuvent avoir accès à ces commandes !')
-            .addField('!launchgame', 'Lancer une partie de KohLanta.')
-            .addField('!setjointeam', 'Autoriser les joueurs à rejoindre les équipes.')
-            .addField('!newepreuve', 'Lancement d\'une épreuve !')
-            .addBlankField(true)
-            .addField('Liste de commandes pour les joueurs !', 'commandes executable par tout le monde !')
-            .addField('!join', 'Rejoidre une team.')
-            .addField('!leave', 'Quitter une équipe.');
-        message.author.sendEmbed(help);
-        
-    }
 
     if(message.content.startsWith('!launchgame')){
         if(gameOn === false){
@@ -96,27 +87,10 @@ client.on('message', message => {
 
     if(message.content.startsWith('!startepreuve')){
         if(msgArgs[1] == 'code'){
-            message.channel.sendEmbed(code1);
+            let confirmEpreuveVariable = confirmEpreuve(code);
+            message.channel.send(confirmEpreuveVariable);
             reponse = 'if number 8';
             epreuveStarted = true;
-        }
-    }
-
-    if(message.content.startsWith('!r')){
-        if(epreuveStarted == true){
-            let mreponse = message.content.substr(3);
-            if(mreponse == reponse){
-                epreuveStarted = false;
-                if(message.member.roles.find('name', 'teamJaune')){
-                    pointGagne('jaune');
-                    return;
-                }else{
-                    pointGagne('rouge');
-                    return;
-                }
-            }else{
-                message.reply('réponse fausse');
-            }
         }
     }
 
@@ -152,6 +126,24 @@ client.on('message', message => {
                 .setColor("#ab0000")
                 .addField('La partie est lancé', 'Vous ne pouvez pas activer cette commande !');
             message.channel.sendEmbed(error);
+        }
+    }
+
+    if(message.content.startsWith('!r')){
+        if(epreuveStarted == true){
+            let mreponse = message.content.substr(3);
+            if(mreponse == reponse){
+                epreuveStarted = false;
+                if(message.member.roles.find('name', 'teamJaune')){
+                    pointGagne('jaune');
+                    return;
+                }else{
+                    pointGagne('rouge');
+                    return;
+                }
+            }else{
+                message.reply('réponse fausse');
+            }
         }
     }
 
@@ -254,7 +246,84 @@ client.on('message', message => {
 
         }
     }
-    
+
+    if(message.content.startsWith('!help')){
+        let help = new Discord.RichEmbed()
+            .setAuthor(client.user.username)
+            .setColor('RANDOM')
+            .setTitle('Liste des commandes du bot !')
+            .addBlankField(true)
+            .addField('!help', 'Avoir la liste des commandes du bot.')
+            .addBlankField(true)
+            .addField('Commande Administrateur', 'Seul les admin du serveur peuvent avoir accès à ces commandes !')
+            .addField('!launchgame', 'Lancer une partie de KohLanta.')
+            .addField('!setjointeam', 'Autoriser les joueurs à rejoindre les équipes.')
+            .addField('!newepreuve', 'Lancement d\'une épreuve !')
+            .addBlankField(true)
+            .addField('Liste de commandes pour les joueurs !', 'commandes executable par tout le monde !')
+            .addField('!join', 'Rejoidre une team.')
+            .addField('!leave', 'Quitter une équipe.');
+        message.author.sendEmbed(help);
+        
+    }
+
+    if(message.content.startsWith('!find')){
+
+        if(objectFind == false){
+            if(findObeject.includes(message.author.username)){
+                let Embed = new Discord.RichEmbed()
+                    .setAuthor(client.username)
+                    .setColor('#ab0000')
+                    .addField('Vous avez déjà chercher l\'object', 'réessayez plus tard !');
+                message.channel.send(Embed);
+            }else{
+
+                findObeject.push(message.author.username);
+                if(Math.random() * 100 < 10){
+                    objectFind = true;
+
+                    if(!db.get('object').find({user: message.author.id})){
+                        db.get('object')
+                            .push({user: message.author.id, hasObject: true})
+                            .write();
+                    }else{
+                        db.get('object').find({user: message.author.id}).assisgn({user: message.author.id, hasObject: true});
+                    }
+
+                    let Embed = new Discord.RichEmbed()
+                        .setAuthor(client.username)
+                        .setColor('#00ab00')
+                        .addField('Vous venez de trouvé l\'object', 'Vous pourrez l\'utiliser au conseil !');
+                    message.author.send(Embed); 
+                }else{
+                    if(!db.get('object').find({user: message.author.id})){
+                        db.get('object')
+                            .push({user: message.author.id, hasObject: false})
+                            .write();
+                    }else{
+                        db.get('object').find({user: message.author.id}).assisgn({user: message.author.id, hasObject: false});
+                    }
+
+                    let Embed = new Discord.RichEmbed()
+                        .setAuthor(client.username)
+                        .setColor('#00ab00')
+                        .addField('Vous n\'avez pas trouvé l\'object', 'Pas de chance !');
+                    message.author.send(Embed); 
+
+                }
+
+            }
+        }else{
+
+            let Embed = new Discord.RichEmbed()
+                .setAuthor(client.username)
+                .setColor('#00ab00')
+                .addField('Vous n\'avez pas trouvé l\'object', 'Pas de chance !');
+            message.author.send(Embed);
+
+        }
+    }
+
     function leaveTeam(team){
 
         if(team == 'TeamJaune'){
@@ -283,7 +352,6 @@ client.on('message', message => {
             }
             randomNumber(2);
         }else{
-            console.log(r); 
             return r;
         }
   
@@ -315,7 +383,7 @@ client.on('message', message => {
     }
 })
 
-client.login(process.env.TOKEN);
+client.login('token');
 
 let livreDeCode = new Discord.RichEmbed()
     .setAuthor('KohLanta')
@@ -339,11 +407,7 @@ let epreuveCode = new Discord.RichEmbed()
     .addBlankField(true)
     .setFooter('Bonne chance à tous');
 
-let confirmEpreuveCode = new Discord.RichEmbed()
-    .setAuthor('KohLanta')
-    .setColor('RANDOM')
-    .setTitle('Epreuve du code lancé !')
-    .addField('Vous pouvez lancer l\'épreuve quand vous voulez', '!startepreuve code');
+
 let code1 = new Discord.RichEmbed()
     .setAuthor('KohLanta')
     .setColor('#ab0000')
@@ -352,4 +416,12 @@ let code1 = new Discord.RichEmbed()
     .addField('Voici le code', 'Je veux savoir si ma variable number est égale à 8')
     .addField(' __(______ == _)', '!r pour répondre, séparez les éléments de réponses par des espace: !r jl hhhhhh 7');
 
+function confirmEpreuve(epr){
 
+    let confirmEpreuveEmbed = new Discord.RichEmbed()
+        .setAuthor('KohLanta')
+        .setColor('RANDOM')
+        .setTitle('Epreuve du code lancé !')
+        .addField('Vous pouvez lancer l\'épreuve quand vous voulez', '!startepreuve ' + epr);
+    return confirmEpreuveEmbed;
+}
