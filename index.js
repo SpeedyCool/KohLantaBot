@@ -269,7 +269,6 @@ client.on('message', message => {
 
     if(message.content.startsWith('!find')){
 
-        if(objectFind == false){
             if(findObeject.includes(message.author.username)){
                 let Embed = new Discord.RichEmbed()
                     .setAuthor(client.username)
@@ -277,50 +276,47 @@ client.on('message', message => {
                     .addField('Vous avez déjà chercher l\'object', 'réessayez plus tard !');
                 message.channel.send(Embed);
             }else{
+                if(objectFind == false){
+                    findObeject.push(message.author.username);
+                    if(Math.random() * 100 < 10){
+                        objectFind = true;
 
-                findObeject.push(message.author.username);
-                if(Math.random() * 100 < 10){
-                    objectFind = true;
+                        if(!db.get('object').find({user: message.author.id})){
+                            db.get('object')
+                                .push({user: message.author.id, hasObject: true})
+                                .write();
+                        }else{
+                            db.get('object').find({user: message.author.id}).assign({user: message.author.id, hasObject: true});
+                        }
 
-                    if(!db.get('object').find({user: message.author.id})){
-                        db.get('object')
-                            .push({user: message.author.id, hasObject: true})
-                            .write();
+                        let Embed = new Discord.RichEmbed()
+                            .setAuthor(client.username)
+                            .setColor('#00ab00')
+                            .addField('Vous venez de trouvé l\'object', 'Vous pourrez l\'utiliser au conseil !');
+                        message.author.send(Embed); 
                     }else{
-                        db.get('object').find({user: message.author.id}).assign({user: message.author.id, hasObject: true});
-                    }
+                        if(!db.get('object').find({user: message.author.id})){
+                            db.get('object')
+                                .push({user: message.author.id, hasObject: false})
+                                .write();
+                        }else{
+                            db.get('object').find({user: message.author.id}).assign({user: message.author.id, hasObject: false});
+                        }
 
-                    let Embed = new Discord.RichEmbed()
-                        .setAuthor(client.username)
-                        .setColor('#00ab00')
-                        .addField('Vous venez de trouvé l\'object', 'Vous pourrez l\'utiliser au conseil !');
-                    message.author.send(Embed); 
-                }else{
-                    if(!db.get('object').find({user: message.author.id})){
-                        db.get('object')
-                            .push({user: message.author.id, hasObject: false})
-                            .write();
-                    }else{
-                        db.get('object').find({user: message.author.id}).assign({user: message.author.id, hasObject: false});
-                    }
+                        let Embed = new Discord.RichEmbed()
+                            .setAuthor(client.username)
+                            .setColor('#00ab00')
+                            .addField('Vous n\'avez pas trouvé l\'object', 'Pas de chance !');
+                        message.author.send(Embed); 
 
-                    let Embed = new Discord.RichEmbed()
-                        .setAuthor(client.username)
-                        .setColor('#00ab00')
-                        .addField('Vous n\'avez pas trouvé l\'object', 'Pas de chance !');
-                    message.author.send(Embed); 
-
-                }
-
-            }
-        }else{
-
-            let Embed = new Discord.RichEmbed()
+                 }
+             }else{
+                let Embed = new Discord.RichEmbed()
                 .setAuthor(client.username)
                 .setColor('#00ab00')
                 .addField('Vous n\'avez pas trouvé l\'object', 'Pas de chance !');
-            message.author.send(Embed);
-
+            message.author.send(Embed); 
+             }
         }
     }
 
