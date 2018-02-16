@@ -134,6 +134,7 @@ client.on('message', message => {
             let mreponse = message.content.substr(3);
             if(mreponse == reponse){
                 epreuveStarted = false;
+                findObeject = [];
                 if(message.member.roles.find('name', 'teamJaune')){
                     pointGagne('jaune');
                     return;
@@ -374,7 +375,8 @@ client.on('message', message => {
         let victoire = new Discord.RichEmbed()
             .setAuthor(client.user.username)
             .setColor('#00aa00')
-            .addField('L\'équipe ' + team + ' a remporté l\'épreuve !', '+1 points pour l\'équipe !');
+            .addField('L\'équipe ' + team + ' a remporté l\'épreuve !', '+1 points pour l\'équipe !')
+            .addField('Vous pouvez retenter de trouver l\'object cachée', 'Faites !find');
         message.channel.sendEmbed(victoire);
     }
 })
