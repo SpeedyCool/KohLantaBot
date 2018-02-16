@@ -87,8 +87,7 @@ client.on('message', message => {
 
     if(message.content.startsWith('!startepreuve')){
         if(msgArgs[1] == 'code'){
-            let confirmEpreuveVariable = confirmEpreuve(code);
-            message.channel.send(confirmEpreuveVariable);
+            message.channel.send(code1);
             reponse = 'if number 8';
             epreuveStarted = true;
         }
@@ -361,7 +360,7 @@ client.on('message', message => {
         }
         if(number == 2){
             message.channel.sendEmbed(epreuveCode);
-            let confirmEpreuveEmbed = confirmEpreuve(code);
+            let confirmEpreuveEmbed = confirmEpreuve('code');
             message.author.sendEmbed(confirmEpreuveEmbed);
             let tribuJ = message.guild.channels.find('name', 'tribu-jaune');
             let tribuR = message.guild.channels.find('name', 'tribu-rouge');
