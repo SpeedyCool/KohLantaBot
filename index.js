@@ -361,7 +361,8 @@ client.on('message', message => {
         }
         if(number == 2){
             message.channel.sendEmbed(epreuveCode);
-            message.author.sendEmbed(confirmEpreuveCode);
+            let confirmEpreuveEmbed = confirmEpreuve(code);
+            message.author.sendEmbed(confirmEpreuveEmbed);
             let tribuJ = message.guild.channels.find('name', 'tribu-jaune');
             let tribuR = message.guild.channels.find('name', 'tribu-rouge');
             tribuJ.sendEmbed(livreDeCode);
